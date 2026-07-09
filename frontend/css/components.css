@@ -1,0 +1,97 @@
+/* ===========================
+   Buttons
+=========================== */
+
+.btn-primary{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#2563EB;
+    color:#fff;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    margin-top:10px;
+}
+
+.btn-primary:hover{
+    background:#1D4ED8;
+}
+
+.btn-secondary{
+    width:100%;
+    padding:15px;
+    margin-top:15px;
+    border:none;
+    border-radius:10px;
+    background:#F3F4F6;
+    color:#111827;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.btn-secondary:hover{
+    background:#E5E7EB;
+}
+
+/* ===========================
+   Form
+=========================== */
+
+.form-group{
+    margin-bottom:20px;
+}
+
+.form-group label{
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
+    color:#111827;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+
+    width:100%;
+    padding:14px 16px;
+
+    border:1px solid #D1D5DB;
+    border-radius:10px;
+
+    font-size:16px;
+
+    outline:none;
+
+    transition:.3s;
+
+    box-sizing:border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 0 3px rgba(37,99,235,.15);
+
+}
+
+/* ===========================
+   Message
+=========================== */
+
+#message{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}

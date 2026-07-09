@@ -5,9 +5,10 @@
 
     <meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>Student Dashboard | InternshipX</title>
+    <title>Applicants | InternshipX</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/components.css">
@@ -15,9 +16,12 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
 
 </head>
 
@@ -27,18 +31,21 @@
 
     <div class="logo">
 
-        <h2>Internship<span>X</span></h2>
+        <h2>
+
+            Internship<span>X</span>
+
+        </h2>
 
     </div>
 
     <div class="header-right">
 
-        <span id="studentName">
+        <span id="companyName">
 
             Welcome
 
         </span>
-    
 
         <button
             id="logoutBtn"
@@ -54,60 +61,29 @@
 
 <main class="dashboard-container">
 
-    <!-- Welcome -->
-
     <section class="welcome-card">
 
         <h1>
 
-            Welcome Back 👋
+            Internship Applications
 
         </h1>
 
         <p>
 
-            Explore internships and apply to kickstart your career.
+            Review and manage student applications.
 
         </p>
 
     </section>
-    
-<section class="action-section">
-
-    <button
-        id="myApplicationsBtn"
-        class="btn-primary">
-
-        My Applications
-
-    </button>
-
-</section>
-
-    <!-- Search -->
-
-    <section class="search-section">
-
-        <input
-            type="text"
-            id="searchInput"
-            placeholder="Search by title, company or skill...">
-
-    </section>
-
-    <!-- Statistics -->
 
     <section class="stats-grid">
 
         <div class="stat-card">
 
-            <h3>
+            <h3>Total Applications</h3>
 
-                Available Internships
-
-            </h3>
-
-            <h2 id="availableInternships">
+            <h2 id="totalApplications">
 
                 0
 
@@ -117,13 +93,9 @@
 
         <div class="stat-card">
 
-            <h3>
+            <h3>Pending</h3>
 
-                My Applications
-
-            </h3>
-
-            <h2 id="myApplications">
+            <h2 id="pendingApplications">
 
                 0
 
@@ -133,11 +105,7 @@
 
         <div class="stat-card">
 
-            <h3>
-
-                Accepted
-
-            </h3>
+            <h3>Accepted</h3>
 
             <h2 id="acceptedApplications">
 
@@ -149,29 +117,25 @@
 
     </section>
 
-    <!-- Internship List -->
-
     <section class="internship-section">
 
         <div class="section-title">
 
             <h2>
 
-                Browse Internships
+                Applicants
 
             </h2>
 
         </div>
 
-        <div
-            id="internshipList"
-            class="internship-list">
+        <div id="applicationList">
 
             <div class="empty-state">
 
                 <h3>
 
-                    Loading internships...
+                    Loading applications...
 
                 </h3>
 

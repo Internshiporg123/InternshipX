@@ -1,3 +1,4 @@
+const sendOTPEmail = require("../services/emailService");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -37,13 +38,16 @@ exports.register = async (req, res) => {
       otp,
       otpExpiry: Date.now() + 10 * 60 * 1000
     });
+    await sendOTPEmail(
+    user.email,
+    user.name,
+    otp
+);
 
     res.status(201).json({
-      success: true,
-      message: "User registered successfully.",
-      otp // Temporary for testing; we'll remove this after email is working.
-    });
-
+    success: true,
+    message: "Verification code sent to your email."
+});
   } catch (err) {
     console.error(err);
 
@@ -101,15 +105,15 @@ exports.verifyOTP = async (req, res) => {
         });
 
     } catch (err) {
-        console.error(err);
+    console.error("VERIFY OTP ERROR:");
+    console.error(err);
 
-        res.status(500).json({
-            success: false,
-            message: "Server Error"
-        });
-    }
+    return res.status(500).json({
+        success: false,
+        message: err.message
+    });
+}
 };
-
 
 exports.resendOTP = async (req, res) => {
   try {
@@ -139,13 +143,16 @@ exports.resendOTP = async (req, res) => {
 
     await user.save();
 
-    // Later this will be emailed using Nodemailer
-    return res.json({
-      success: true,
-      message: "New OTP generated.",
-      otp
-    });
+    await sendOTPEmail(
+    user.email,
+    user.name,
+    otp
+);
 
+return res.json({
+    success: true,
+    message: "A new verification code has been sent."
+});
   } catch (err) {
     console.error(err);
 

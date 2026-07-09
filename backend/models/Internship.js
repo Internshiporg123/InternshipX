@@ -32,11 +32,10 @@ const internshipSchema = new mongoose.Schema(
         required: true
     },
 
-    skills: [
-        {
-            type: String
-        }
-    ],
+    skills: {
+    type: [String],
+    default: []
+},
 
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,

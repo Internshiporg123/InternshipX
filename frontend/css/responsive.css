@@ -1,0 +1,42 @@
+/* ===========================
+   Tablet
+=========================== */
+
+@media(max-width:768px){
+
+    .auth-card{
+
+        width:90%;
+        padding:35px;
+
+    }
+
+}
+
+/* ===========================
+   Mobile
+=========================== */
+
+@media(max-width:480px){
+
+    .auth-card{
+
+        width:92%;
+        padding:25px;
+
+    }
+
+    .auth-card h1{
+
+        font-size:32px;
+
+    }
+
+    .btn-primary,
+    .btn-secondary{
+
+        font-size:15px;
+
+    }
+
+}

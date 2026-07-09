@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Register | InternshipX</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="auth-container">
+
+    <div class="auth-card">
+
+        <div class="logo-section">
+
+            <h1>Internship<span>X</span></h1>
+
+            <p>Launch Your Career</p>
+
+        </div>
+
+        <h2>Create Account</h2>
+
+        <p class="subtitle">
+            Join InternshipX and discover internships from top companies.
+        </p>
+
+        <form id="registerForm">
+
+            <!-- Name -->
+
+            <div class="input-group">
+
+                <label>Full Name</label>
+
+                <div class="input-box">
+
+                    <i data-lucide="user"></i>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Enter your full name"
+                        required
+                    >
+
+                </div>
+
+                <small id="nameError"></small>
+
+            </div>
+
+            <!-- Email -->
+
+            <div class="input-group">
+
+                <label>Email Address</label>
+
+                <div class="input-box">
+
+                    <i data-lucide="mail"></i>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+                <small id="emailError"></small>
+
+            </div>
+
+            <!-- Password -->
+
+            <div class="input-group">
+
+                <label>Password</label>
+
+                <div class="input-box">
+
+                    <i data-lucide="lock"></i>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Minimum 8 characters"
+                        required
+                    >
+
+                </div>
+
+                <small id="passwordError"></small>
+
+            </div>
+
+            <!-- Role -->
+
+            <div class="input-group">
+
+                <label>Register As</label>
+
+                <div class="role-selector">
+
+                    <label class="role-card">
+
+                        <input
+                            type="radio"
+                            name="role"
+                            value="student"
+                            checked
+                        >
+
+                        <i data-lucide="graduation-cap"></i>
+
+                        <span>Student</span>
+
+                    </label>
+
+                    <label class="role-card">
+
+                        <input
+                            type="radio"
+                            name="role"
+                            value="company"
+                        >
+
+                        <i data-lucide="briefcase-business"></i>
+
+                        <span>Company</span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <button
+                id="registerBtn"
+                type="submit"
+                class="btn-primary"
+            >
+
+                Create Account
+
+            </button>
+
+        </form>
+
+        <div id="message"></div>
+
+        <div class="bottom-text">
+
+            Already have an account?
+
+            <a href="login.html">
+
+                Login
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+
+</body>
+</html>
