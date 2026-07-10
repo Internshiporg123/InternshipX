@@ -51,8 +51,10 @@ To make your project accessible to anyone on the web, you can deploy the backend
    * `PORT`: `5000`
    * `MONGO_URI`: `mongodb://maksuf_db_user:Maksuf123@ac-eonrj20-shard-00-00.ewxhwth.mongodb.net:27017,ac-eonrj20-shard-00-01.ewxhwth.mongodb.net:27017,ac-eonrj20-shard-00-02.ewxhwth.mongodb.net:27017/?ssl=true&replicaSet=atlas-ra93s4-shard-0&authSource=admin&appName=Cluster0`
    * `JWT_SECRET`: `ThisIsMySecretKey123`
-   * `EMAIL_USER`: `maksufmasrur786@gmail.com`
-   * `EMAIL_PASS`: `ojepqzrowkbellcb`
+   * `EMAIL_USER`: `maksufmasrur786@gmail.com` (Use Gmail app username, or Brevo SMTP login if using Brevo)
+   * `EMAIL_PASS`: `ojepqzrowkbellcb` (Use Gmail App Password, or Brevo SMTP master key if using Brevo)
+   * `SMTP_HOST`: `smtp.gmail.com` (For Gmail) or `smtp-relay.brevo.com` (For Brevo)
+   * `SMTP_PORT`: `2525` (Crucial: Render Free Tier blocks ports 25, 465, and 587. Using Brevo on port `2525` bypasses this block!)
 7. Click **Deploy Web Service**. Once deployed, Render will provide a live URL (e.g. `https://internshipx-backend.onrender.com`).
 
 ---
