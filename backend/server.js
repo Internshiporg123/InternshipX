@@ -11,6 +11,9 @@ const roleMiddleware = require("./middleware/roleMiddleware");
 const internshipRoutes = require("./routes/internshipRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const app = express();
+
+app.set("trust proxy", 1);
+
 connectDB();
 app.use(cors());
 app.use(express.json());

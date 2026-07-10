@@ -35,10 +35,10 @@ const otpLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// Rate limiter for OTP sending — 3 sends per 15 minutes per IP
+// Rate limiter for OTP sending - 10 sends per 15 minutes per IP
 const otpSendLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 3,
+    max: 10,
     message: {
         success: false,
         message: "Too many OTP requests. Please try again after 15 minutes."

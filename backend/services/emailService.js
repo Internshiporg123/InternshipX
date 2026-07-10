@@ -1,17 +1,23 @@
 const nodemailer = require("nodemailer");
 
-console.log("EMAIL_USER =", process.env.EMAIL_USER);
-console.log("EMAIL_PASS exists =", !!process.env.EMAIL_PASS);
+const SMTP_TIMEOUT_MS = Number(process.env.SMTP_TIMEOUT_MS) || 10000;
 
 const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
-    }
+    },
+    connectionTimeout: SMTP_TIMEOUT_MS,
+    greetingTimeout: SMTP_TIMEOUT_MS,
+    socketTimeout: SMTP_TIMEOUT_MS
 });
 
 const sendOTPEmail = async (email, name, otp, type = "verify") => {
+
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        throw new Error("Email service is not configured.");
+    }
 
     console.log("Sending OTP email...");
     console.log("To:", email);
@@ -21,10 +27,6 @@ const sendOTPEmail = async (email, name, otp, type = "verify") => {
     const subject = isReset
         ? "Reset Your InternshipX Password"
         : "Verify Your InternshipX Account";
-
-    const heading = isReset
-        ? "Password Reset"
-        : "Email Verification";
 
     const bodyText = isReset
         ? "We received a request to reset your password."
