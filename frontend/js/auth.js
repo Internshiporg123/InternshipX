@@ -74,7 +74,7 @@ async function registerUser(e) {
 
         // Save email for OTP page
 
-        localStorage.setItem("verifyEmail", email);
+        sessionStorage.setItem("verifyEmail", email);
 
         setTimeout(() => {
 
@@ -106,7 +106,7 @@ const emailInput = document.getElementById("email");
 
 if (emailInput) {
 
-    const savedEmail = localStorage.getItem("verifyEmail");
+    const savedEmail = sessionStorage.getItem("verifyEmail");
 
     if (savedEmail) {
         emailInput.value = savedEmail;
@@ -121,7 +121,7 @@ const verifyForm = document.getElementById("verifyForm");
 
 if (verifyForm) {
 
-    const savedEmail = localStorage.getItem("verifyEmail");
+    const savedEmail = sessionStorage.getItem("verifyEmail");
 
     if (savedEmail) {
         document.getElementById("email").value = savedEmail;
@@ -156,7 +156,7 @@ async function verifyOTP(e) {
         message.style.color = "#22C55E";
         message.innerHTML = response.message;
 
-        localStorage.removeItem("verifyEmail");
+        sessionStorage.removeItem("verifyEmail");
 
         setTimeout(() => {
 
@@ -251,8 +251,8 @@ async function loginUser(e) {
             }
         );
 
-        localStorage.setItem("token", response.token);
-        localStorage.setItem("user", JSON.stringify(response.user));
+        sessionStorage.setItem("token", response.token);
+        sessionStorage.setItem("user", JSON.stringify(response.user));
 
         message.style.color = "#22C55E";
         message.innerHTML = response.message;
@@ -324,7 +324,7 @@ async function sendResetCode(e) {
         message.innerHTML = response.message;
 
         // Save email and show step 2
-        localStorage.setItem("resetEmail", email);
+        sessionStorage.setItem("resetEmail", email);
 
         setTimeout(() => {
             showResetForm(email);
@@ -373,7 +373,7 @@ if (verifyResetOtpForm) {
     verifyResetOtpForm.addEventListener("submit", resetPassword);
 
     // If page reloaded and email is stored, show step 2
-    const savedResetEmail = localStorage.getItem("resetEmail");
+    const savedResetEmail = sessionStorage.getItem("resetEmail");
 
     if (savedResetEmail) {
         showResetForm(savedResetEmail);
@@ -432,7 +432,7 @@ async function resetPassword(e) {
         message.style.color = "#22C55E";
         message.innerHTML = response.message;
 
-        localStorage.removeItem("resetEmail");
+        sessionStorage.removeItem("resetEmail");
 
         setTimeout(() => {
 

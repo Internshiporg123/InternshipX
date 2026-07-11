@@ -57,6 +57,31 @@ const userSchema = new mongoose.Schema(
     profileImage:{
         type:String,
         default:""
+    },
+
+    phone:{
+        type:String,
+        default:""
+    },
+
+    college:{
+        type:String,
+        default:""
+    },
+
+    skills:{
+        type:[String],
+        default:[]
+    },
+
+    resumeUrl:{
+        type:String,
+        default:""
+    },
+
+    resumeName:{
+        type:String,
+        default:""
     }
 
 },

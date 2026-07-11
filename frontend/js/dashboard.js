@@ -2,13 +2,13 @@
 // InternshipX Dashboard
 // ==========================================
 
-const token = localStorage.getItem("token");
+const token = sessionStorage.getItem("token");
 let editingInternshipId = null;
 let allInternships = [];
 let user = null;
 
 try {
-    user = JSON.parse(localStorage.getItem("user"));
+    user = JSON.parse(sessionStorage.getItem("user"));
 } catch (error) {
     user = null;
 }
@@ -38,9 +38,9 @@ if (logoutBtn) {
 }
 
 function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("verifyEmail");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("verifyEmail");
 
     window.location.href = "login.html";
 }
@@ -61,6 +61,12 @@ const profileForm = document.getElementById("profileForm");
 const profileNameInput = document.getElementById("profileName");
 const profileEmailInput = document.getElementById("profileEmail");
 const profileEmailOtpInput = document.getElementById("profileEmailOtp");
+const profilePhoneInput = document.getElementById("profilePhone");
+const profileCollegeInput = document.getElementById("profileCollege");
+const profileSkillsInput = document.getElementById("profileSkills");
+const profileResumeInput = document.getElementById("profileResume");
+const resumeContainer = document.getElementById("resumeContainer");
+const currentResumeLink = document.getElementById("currentResumeLink");
 const emailVerifyPanel = document.getElementById("emailVerifyPanel");
 const changeEmailBtn = document.getElementById("changeEmailBtn");
 const sendEmailCodeBtn = document.getElementById("sendEmailCodeBtn");
@@ -309,7 +315,10 @@ async function saveProfile(event) {
     const submitButton = profileForm.querySelector('button[type="submit"]');
     const profile = {
         name: profileNameInput.value.trim(),
-        email: profileEmailInput.value.trim()
+        email: profileEmailInput.value.trim(),
+        phone: profilePhoneInput ? profilePhoneInput.value.trim() : "",
+        college: profileCollegeInput ? profileCollegeInput.value.trim() : "",
+        skills: profileSkillsInput ? profileSkillsInput.value.trim() : ""
     };
 
     if (normalizeProfileEmail(profile.email) !== normalizeProfileEmail(user?.email)) {
@@ -324,6 +333,33 @@ async function saveProfile(event) {
             submitButton.textContent = "Saving...";
         }
 
+        // Check for resume upload first
+        if (profileResumeInput && profileResumeInput.files && profileResumeInput.files[0]) {
+            const resumeFile = profileResumeInput.files[0];
+
+            // Enforce 5 MB maximum size limit
+            if (resumeFile.size > 5 * 1024 * 1024) {
+                alert("Resume must be smaller than 5 MB.");
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Save Profile";
+                }
+                return;
+            }
+
+            showProfileMessage("Uploading resume...");
+            const formData = new FormData();
+            formData.append("resume", resumeFile);
+
+            const uploadRes = await apiRequest("/profile/resume", "POST", formData);
+            if (uploadRes && uploadRes.success) {
+                if (user) {
+                    user.resumeUrl = uploadRes.resumeUrl;
+                    user.resumeName = uploadRes.resumeName;
+                }
+            }
+        }
+
         showProfileMessage("Saving profile...");
 
         const response = await apiRequest("/profile", "PUT", profile);
@@ -332,6 +368,11 @@ async function saveProfile(event) {
         renderProfile(response.user);
         showProfileMessage(response.message);
         showToast(response.message);
+
+        // Clear file input since upload is complete
+        if (profileResumeInput) {
+            profileResumeInput.value = "";
+        }
     } catch (error) {
         showProfileMessage(error.message, true);
         showToast(error.message);
@@ -354,6 +395,27 @@ function renderProfile(profileUser) {
         profileEmailInput.value = profileUser.email || "";
     }
 
+    if (profilePhoneInput) {
+        profilePhoneInput.value = profileUser.phone || "";
+    }
+
+    if (profileCollegeInput) {
+        profileCollegeInput.value = profileUser.college || "";
+    }
+
+    if (profileSkillsInput) {
+        const skillsArray = profileUser.skills || [];
+        profileSkillsInput.value = Array.isArray(skillsArray) ? skillsArray.join(", ") : skillsArray;
+    }
+
+    if (resumeContainer && currentResumeLink && profileUser.resumeUrl) {
+        resumeContainer.style.display = "block";
+        currentResumeLink.href = profileUser.resumeUrl;
+        currentResumeLink.textContent = profileUser.resumeName || "Download Resume";
+    } else if (resumeContainer) {
+        resumeContainer.style.display = "none";
+    }
+
     updateText("profileDisplayName", profileUser.name || "Profile");
     updateText("profileDisplayEmail", profileUser.email || "");
     updateText("profileRoleBadge", getRoleLabel(profileUser.role));
@@ -366,7 +428,7 @@ function renderProfile(profileUser) {
 
 function saveUserSession(nextUser, nextToken) {
     if (nextToken) {
-        localStorage.setItem("token", nextToken);
+        sessionStorage.setItem("token", nextToken);
     }
 
     if (nextUser) {
@@ -375,7 +437,7 @@ function saveUserSession(nextUser, nextToken) {
             ...nextUser
         };
 
-        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("user", JSON.stringify(user));
         updateHeaderNames();
     }
 }
@@ -409,7 +471,7 @@ async function requestProfileEmailVerification() {
             ...user,
             pendingEmail: response.pendingEmail
         };
-        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("user", JSON.stringify(user));
 
         if (profileEmailOtpInput) {
             profileEmailOtpInput.value = "";
@@ -611,28 +673,42 @@ function renderCompanyApplications(applications) {
     }
 
     list.innerHTML = applications
-        .map((app) => `
-            <div class="internship-card">
-                <h3>${escapeHTML(app.student?.name || "Student")}</h3>
-                <p>${escapeHTML(app.student?.email || "No email available")}</p>
-                <p><strong>${escapeHTML(app.internship?.title || "Internship")}</strong></p>
-                <p>Status: ${renderStatus(app.status)}</p>
+        .map((app) => {
+            const student = app.student || {};
+            const skills = Array.isArray(student.skills) ? student.skills.join(", ") : (student.skills || "N/A");
+            const resumeLink = app.resume || student.resumeUrl;
+            
+            const resumeHTML = resumeLink
+                ? `<p><strong>Resume:</strong> <a href="${escapeHTML(resumeLink)}" target="_blank" style="color: #3B82F6; text-decoration: underline;">Download Resume</a></p>`
+                : `<p><strong>Resume:</strong> No resume uploaded</p>`;
 
-                <div class="card-actions">
-                    <button
-                        class="btn-primary accept-btn"
-                        data-id="${app._id}">
-                        Accept
-                    </button>
+            return `
+                <div class="internship-card">
+                    <h3>${escapeHTML(student.name || "Student")}</h3>
+                    <p>Email: ${escapeHTML(student.email || "No email available")}</p>
+                    <p>Phone: ${escapeHTML(student.phone || "N/A")}</p>
+                    <p>College: ${escapeHTML(student.college || "N/A")}</p>
+                    <p>Skills: ${escapeHTML(skills)}</p>
+                    ${resumeHTML}
+                    <p><strong>Applied For:</strong> ${escapeHTML(app.internship?.title || "Internship")}</p>
+                    <p>Status: ${renderStatus(app.status)}</p>
 
-                    <button
-                        class="btn-secondary reject-btn"
-                        data-id="${app._id}">
-                        Reject
-                    </button>
+                    <div class="card-actions">
+                        <button
+                            class="btn-primary accept-btn"
+                            data-id="${app._id}">
+                            Accept
+                        </button>
+
+                        <button
+                            class="btn-secondary reject-btn"
+                            data-id="${app._id}">
+                            Reject
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `)
+            `;
+        })
         .join("");
 }
 
@@ -807,7 +883,7 @@ function setProfileEmailEditing(isEditing, options = {}) {
             ...user,
             pendingEmail: ""
         };
-        localStorage.setItem("user", JSON.stringify(user));
+        sessionStorage.setItem("user", JSON.stringify(user));
         clearProfileEmailOtp();
     }
 

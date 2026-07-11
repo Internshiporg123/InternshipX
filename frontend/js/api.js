@@ -10,13 +10,15 @@ async function apiRequest(endpoint, method = "GET", body = null) {
     const options = {
         method,
         signal: controller.signal,
-        headers: {
-            "Content-Type": "application/json"
-        }
+        headers: {}
     };
 
+    if (!(body instanceof FormData)) {
+        options.headers["Content-Type"] = "application/json";
+    }
+
     // Add JWT if available
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     if (token) {
         options.headers.Authorization = `Bearer ${token}`;
@@ -24,7 +26,7 @@ async function apiRequest(endpoint, method = "GET", body = null) {
 
     // Add request body
     if (body) {
-        options.body = JSON.stringify(body);
+        options.body = body instanceof FormData ? body : JSON.stringify(body);
     }
 
     try {

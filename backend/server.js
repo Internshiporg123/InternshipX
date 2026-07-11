@@ -14,8 +14,14 @@ const {
     getProfile,
     updateProfile,
     requestEmailVerification,
-    verifyEmailUpdate
+    verifyEmailUpdate,
+    uploadResume
 } = require("./controllers/profileController");
+const multer = require("multer");
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 } // 5MB file size limit
+});
 const app = express();
 
 app.set("trust proxy", 1);
@@ -34,6 +40,7 @@ app.get("/api/profile", authMiddleware, getProfile);
 app.put("/api/profile", authMiddleware, updateProfile);
 app.post("/api/profile/email-verification", authMiddleware, requestEmailVerification);
 app.post("/api/profile/verify-email", authMiddleware, verifyEmailUpdate);
+app.post("/api/profile/resume", authMiddleware, roleMiddleware("student"), upload.single("resume"), uploadResume);
 app.get(
     "/api/student",
     authMiddleware,

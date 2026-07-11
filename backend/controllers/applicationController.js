@@ -1,5 +1,6 @@
 const Application = require("../models/Application");
 const Internship = require("../models/Internship");
+const User = require("../models/User");
 
 // Student Apply
 exports.applyInternship = async (req, res) => {
@@ -31,10 +32,14 @@ exports.applyInternship = async (req, res) => {
             });
         }
 
+        // Retrieve student's profile details to get their resume URL
+        const student = await User.findById(studentId);
+
         // Create application
         const application = await Application.create({
             internship: internshipId,
-            student: studentId
+            student: studentId,
+            resume: student ? student.resumeUrl : ""
         });
 
         res.status(201).json({
@@ -62,7 +67,7 @@ exports.getCompanyApplications = async (req, res) => {
         const applications = await Application.find({
             internship: { $in: internshipIds }
         })
-        .populate("student", "name email")
+        .populate("student", "name email phone college skills resumeUrl resumeName")
         .populate("internship", "title companyName");
 
         res.json({

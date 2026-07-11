@@ -55,6 +55,9 @@ To make your project accessible to anyone on the web, you can deploy the backend
    * `EMAIL_PASS`: `ojepqzrowkbellcb` (Use Gmail App Password, or Brevo SMTP master key if using Brevo)
    * `SMTP_HOST`: `smtp.gmail.com` (For Gmail) or `smtp-relay.brevo.com` (For Brevo)
    * `SMTP_PORT`: `2525` (Crucial: Render Free Tier blocks ports 25, 465, and 587. Using Brevo on port `2525` bypasses this block!)
+   * `CLOUDINARY_CLOUD_NAME`: `(your Cloudinary Cloud Name)`
+   * `CLOUDINARY_API_KEY`: `(your Cloudinary API Key)`
+   * `CLOUDINARY_API_SECRET`: `(your Cloudinary API Secret)`
 7. Click **Deploy Web Service**. Once deployed, Render will provide a live URL (e.g. `https://internshipx-backend.onrender.com`).
 
 ---

@@ -3,6 +3,7 @@ const User = require("../models/User");
 const Internship = require("../models/Internship");
 const sendOTPEmail = require("../services/emailService");
 const bcrypt = require("bcryptjs");
+const cloudinary = require("../config/cloudinary");
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000;
 const normalizeEmail = (email = "") => email.trim().toLowerCase();
@@ -17,7 +18,12 @@ const formatUser = (user) => ({
     email: user.email,
     role: user.role,
     pendingEmail: user.pendingEmail || "",
-    profileImage: user.profileImage || ""
+    profileImage: user.profileImage || "",
+    phone: user.phone || "",
+    college: user.college || "",
+    skills: user.skills || [],
+    resumeUrl: user.resumeUrl || "",
+    resumeName: user.resumeName || ""
 });
 
 const createProfileToken = (user) => jwt.sign(
@@ -66,7 +72,9 @@ const handleProfileError = (res, error, label) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select("name email role pendingEmail profileImage");
+        const user = await User.findById(req.user.id).select(
+            "name email role pendingEmail profileImage phone college skills resumeUrl resumeName"
+        );
 
         if (!user) {
             return res.status(404).json({
@@ -93,6 +101,15 @@ exports.updateProfile = async (req, res) => {
     try {
         const name = String(req.body.name || "").trim();
         const email = normalizeEmail(req.body.email);
+        const phone = String(req.body.phone || "").trim();
+        const college = String(req.body.college || "").trim();
+
+        let skills = req.body.skills;
+        if (typeof skills === "string") {
+            skills = skills.split(",").map(s => s.trim()).filter(Boolean);
+        } else if (!Array.isArray(skills)) {
+            skills = [];
+        }
 
         if (!name || !email) {
             return res.status(400).json({
@@ -132,6 +149,9 @@ exports.updateProfile = async (req, res) => {
         }
 
         user.name = name;
+        user.phone = phone;
+        user.college = college;
+        user.skills = skills;
 
         await user.save();
 
@@ -315,5 +335,63 @@ exports.verifyEmailUpdate = async (req, res) => {
         });
     } catch (error) {
         return handleProfileError(res, error, "PROFILE EMAIL VERIFY ERROR");
+    }
+};
+
+exports.uploadResume = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                message: "No file uploaded."
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found."
+            });
+        }
+
+        // Upload buffer to Cloudinary
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder: "resumes",
+                resource_type: "raw",
+                public_id: `${Date.now()}-${req.file.originalname}`
+            },
+            async (error, result) => {
+                if (error) {
+                    console.error("Cloudinary Upload Error:", error);
+                    return res.status(500).json({
+                        success: false,
+                        message: "Failed to upload resume to Cloudinary."
+                    });
+                }
+
+                // Save URL and Name to user document
+                user.resumeUrl = result.secure_url;
+                user.resumeName = req.file.originalname;
+                await user.save();
+
+                return res.json({
+                    success: true,
+                    message: "Resume uploaded successfully.",
+                    resumeUrl: user.resumeUrl,
+                    resumeName: user.resumeName
+                });
+            }
+        );
+
+        uploadStream.end(req.file.buffer);
+
+    } catch (error) {
+        console.error("Resume Upload Handler Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server Error during resume upload."
+        });
     }
 };
