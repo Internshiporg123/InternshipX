@@ -1,8 +1,5 @@
-/* ==========================================================
-   InternshipX Premium Landing Page Styles
-========================================================== */
 
-/* Animation Definitions */
+
 @keyframes float {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     50% { transform: translateY(-6px) rotate(0.5deg); }
@@ -25,14 +22,12 @@
     100% { background-position: 0% 50%; }
 }
 
-/* Base Body Modifications for Home */
 .home-page-body {
-    background: #F0F9FF; /* Soft Light Blue background */
-    color: #0F172A; /* Deep slate text */
+    background: #F0F9FF;
+    color: #0F172A;
     overflow-x: hidden;
 }
 
-/* Glow Blobs background decor */
 .glow-blob {
     position: absolute;
     border-radius: 50%;
@@ -68,7 +63,6 @@
     animation-delay: -5s;
 }
 
-/* Landing Header - Premium Glassmorphism */
 .landing-header {
     position: sticky;
     top: 0;
@@ -126,7 +120,6 @@
     color: #FFFFFF;
 }
 
-/* Centered Hero Section (without the preview card) */
 .hero {
     position: relative;
     min-height: calc(100vh - 80px);
@@ -235,7 +228,6 @@
     color: #1D4ED8;
 }
 
-/* Hero Stats Card Container */
 .hero-mini-stats {
     display: flex;
     justify-content: center;
@@ -275,7 +267,6 @@
     background: rgba(37, 99, 235, 0.15);
 }
 
-/* Features Section - Premium Card Grid */
 .features {
     position: relative;
     padding: 100px 8%;
@@ -388,7 +379,6 @@
     line-height: 1.6;
 }
 
-/* How It Works - Connected steps */
 .how-section {
     position: relative;
     padding: 100px 8%;
@@ -404,7 +394,6 @@
     margin: 0 auto;
 }
 
-/* Horizontal line connector for desktop */
 .steps-wrapper::before {
     content: '';
     position: absolute;
@@ -478,7 +467,6 @@
     line-height: 1.55;
 }
 
-/* Premium CTA Section */
 .cta {
     position: relative;
     max-width: 1060px;
@@ -539,7 +527,6 @@
     color: #FFFFFF;
 }
 
-/* Premium Footer */
 .landing-footer {
     background: #F0F9FF;
     color: #6B7280;
@@ -582,7 +569,6 @@
     font-weight: 600;
 }
 
-/* Responsive Overrides */
 @media (max-width: 900px) {
     .hero {
         padding: 80px 8% 80px;
@@ -617,7 +603,7 @@
     }
 
     .steps-wrapper::before {
-        display: none; /* Hide desktop line timeline connector */
+        display: none;
     }
 
     .step {

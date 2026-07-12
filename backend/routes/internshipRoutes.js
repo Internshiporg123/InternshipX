@@ -2,26 +2,24 @@ const express = require("express");
 
 const router = express.Router();
 
-
 const {
     createInternship,
     getCompanyInternships,
     getAllInternships,
     getPublicInternships,
     deleteInternship,
-    updateInternship
+    updateInternship,
+    getInternshipById
 } = require("../controllers/internshipController");
 
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
-// Public latest internships for homepage preview
 router.get(
     "/public/latest",
     getPublicInternships
 );
 
-// Create internship
 router.post(
     "/",
     authMiddleware,
@@ -29,7 +27,6 @@ router.post(
     createInternship
 );
 
-// Get internships of logged-in company
 router.get(
     "/company",
     authMiddleware,
@@ -37,12 +34,18 @@ router.get(
     getCompanyInternships
 );
 
-// Get all internships
 router.get(
     "/",
     authMiddleware,
     getAllInternships
 );
+
+router.get(
+    "/:id",
+    authMiddleware,
+    getInternshipById
+);
+
 router.delete(
     "/:id",
     authMiddleware,

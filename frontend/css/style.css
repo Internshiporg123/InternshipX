@@ -1,6 +1,4 @@
-/* ===========================
-   InternshipX Shared Styles
-=========================== */
+
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap');
 
@@ -63,8 +61,6 @@ button:disabled {
     cursor: not-allowed;
     opacity: .65;
 }
-
-/* ---------- Auth Layout ---------- */
 
 .auth-container {
     min-height: 100vh;
@@ -235,15 +231,28 @@ small {
 }
 
 .role-card i {
-    color: var(--primary);
+    color: var(--text-light);
     width: 30px;
     height: 30px;
     margin-bottom: 8px;
+    transition: color .2s ease;
+}
+
+.role-card:hover i,
+.role-card:has(input:checked) i {
+    color: var(--primary);
 }
 
 .role-card span {
     display: block;
     font-weight: 700;
+    color: var(--text-light);
+    transition: color .2s ease;
+}
+
+.role-card:hover span,
+.role-card:has(input:checked) span {
+    color: var(--text);
 }
 
 #message {
@@ -269,8 +278,6 @@ small {
 .auth-footer a:hover {
     text-decoration: underline;
 }
-
-/* ---------- Dashboard Layout ---------- */
 
 .dashboard-header {
     min-height: 76px;
@@ -687,8 +694,6 @@ small {
     color: #64748B;
 }
 
-/* ---------- Modal ---------- */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -779,7 +784,6 @@ small {
     }
 }
 
-/* ---------- Responsive Overrides ---------- */
 @media (max-width: 768px) {
     .dashboard-header {
         padding: 0 16px;

@@ -11,7 +11,6 @@ const {
     resetPassword
 } = require("../controllers/authController");
 
-// Rate limiter for login - 10 attempts per 15 minutes per IP
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -23,7 +22,6 @@ const loginLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// Rate limiter for OTP verification - 10 attempts per 15 minutes per IP
 const otpLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -35,7 +33,6 @@ const otpLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// Rate limiter for OTP sending - 10 sends per 15 minutes per IP
 const otpSendLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 10,
@@ -47,7 +44,6 @@ const otpSendLimiter = rateLimit({
     legacyHeaders: false
 });
 
-// Rate limiter for registration - 20 per hour per IP
 const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000,
     max: 20,

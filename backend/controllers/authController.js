@@ -59,7 +59,6 @@ const requireValidEmail = (res, email) => {
   return true;
 };
 
-// Register
 exports.register = async (req, res) => {
   try {
     const { name, password, college, industry, location } = req.body;
@@ -136,7 +135,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// Verify OTP
 exports.verifyOTP = async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
@@ -198,7 +196,6 @@ exports.verifyOTP = async (req, res) => {
   }
 };
 
-// Resend OTP
 exports.resendOTP = async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
@@ -239,7 +236,6 @@ exports.resendOTP = async (req, res) => {
   }
 };
 
-// Login
 exports.login = async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
@@ -272,6 +268,13 @@ exports.login = async (req, res) => {
       return res.status(401).json({
         success: false,
         message: "Please verify your email first."
+      });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Your account has been blocked."
       });
     }
 
@@ -312,7 +315,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// Forgot Password
 exports.forgotPassword = async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);
@@ -353,7 +355,6 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// Reset Password
 exports.resetPassword = async (req, res) => {
   try {
     const email = normalizeEmail(req.body.email);

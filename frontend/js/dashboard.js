@@ -1,6 +1,4 @@
-// ==========================================
-// InternshipX Dashboard
-// ==========================================
+
 
 const token = sessionStorage.getItem("token");
 let editingInternshipId = null;
@@ -13,7 +11,7 @@ try {
     user = null;
 }
 
-const currentPage = window.location.pathname.toLowerCase();
+const currentPage = window.location.pathname.toLowerCase().replace(/_/g, "-");
 
 if (!token || !user) {
     window.location.href = "login.html";
@@ -200,6 +198,7 @@ if (currentPage.includes("student-profile") || currentPage.includes("company-pro
 async function loadCompanyDashboard() {
     loadCompanyInternships();
     loadCompanyApplicationStats();
+    loadDashboardAnnouncements();
 }
 
 async function loadCompanyInternships() {
@@ -270,14 +269,29 @@ function renderCompanyInternships(data) {
 
 async function loadStudentDashboard() {
     try {
+        let appliedIds = [];
+        try {
+            const appsData = await apiRequest("/applications/student");
+            const apps = appsData.applications || [];
+            appliedIds = apps.map(app => (app.internship?._id || app.internship).toString());
+
+            const accepted = apps.filter((app) => app.status === "Accepted").length;
+            updateText("myApplications", apps.length);
+            updateText("acceptedApplications", accepted);
+        } catch (err) {
+            console.error("Failed to load application stats", err);
+        }
+
         const internships = await apiRequest("/internships");
         allInternships = internships;
+
+        window.studentAppliedIds = appliedIds;
         renderStudentInternships(allInternships);
+
+        loadDashboardAnnouncements();
     } catch (error) {
         showToast(error.message);
     }
-
-    loadStudentApplicationStats();
 }
 
 async function loadStudentApplicationStats() {
@@ -341,13 +355,11 @@ async function saveProfile(event) {
             submitButton.textContent = "Saving...";
         }
 
-        // Check for resume upload first
         if (profileResumeInput && profileResumeInput.files && profileResumeInput.files[0]) {
             const resumeFile = profileResumeInput.files[0];
 
-            // Enforce 5 MB maximum size limit
             if (resumeFile.size > 5 * 1024 * 1024) {
-                alert("Resume must be smaller than 5 MB.");
+                await showAlertModal("Validation Error", "Resume must be smaller than 5 MB.");
                 if (submitButton) {
                     submitButton.disabled = false;
                     submitButton.textContent = "Save Profile";
@@ -583,11 +595,18 @@ function renderStudentInternships(data) {
         return;
     }
 
+    const appliedIds = window.studentAppliedIds || [];
+
     list.innerHTML = data
         .map((item) => {
             const companyLink = item.postedBy
                 ? `<a href="#" onclick="viewCompanyProfile('${item.postedBy}'); return false;" style="color: #3B82F6; text-decoration: underline; font-weight: 500;">${escapeHTML(item.companyName || "N/A")}</a>`
                 : escapeHTML(item.companyName || "N/A");
+
+            const hasApplied = appliedIds.includes(item._id.toString());
+            const applyBtnHTML = hasApplied
+                ? `<button class="btn-primary" disabled style="opacity: 0.65; cursor: not-allowed;">Applied</button>`
+                : `<button class="btn-primary apply-btn" data-id="${item._id}">Apply Now</button>`;
 
             return `
                 <div class="internship-card">
@@ -601,11 +620,13 @@ function renderStudentInternships(data) {
                     ${renderSkills(item.skills)}
                     <p class="card-description">${escapeHTML(item.description || "No description added yet.")}</p>
 
-                    <div class="card-actions">
+                    <div class="card-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        ${applyBtnHTML}
                         <button
-                            class="btn-primary apply-btn"
-                            data-id="${item._id}">
-                            Apply Now
+                            class="btn-secondary report-btn"
+                            style="border-color: #fca5a5; color: #dc2626; padding: 8px 14px; font-size: 0.85rem; background: transparent; cursor: pointer; border-radius: 8px;"
+                            onclick="openReportModal('${item._id}', '${escapeHTML(item.title)}', '${item.postedBy?._id || item.postedBy}', '${escapeHTML(item.companyName)}')">
+                            ⚠ Report
                         </button>
                     </div>
                 </div>
@@ -640,6 +661,24 @@ async function loadMyApplications() {
     }
 }
 
+async function cancelUserApplication(applicationId) {
+    const confirmCancel = await showConfirmModal(
+        "Cancel Application?",
+        "Are you sure you want to cancel this application?",
+        "Yes, Cancel",
+        "No"
+    );
+    if (!confirmCancel) return;
+
+    try {
+        const response = await apiRequest(`/applications/${applicationId}`, "DELETE");
+        showToast(response.message);
+        loadMyApplications();
+    } catch (error) {
+        showToast(error.message);
+    }
+}
+
 function renderApplications(applications) {
     const list = document.getElementById("applicationList");
 
@@ -658,6 +697,11 @@ function renderApplications(applications) {
     list.innerHTML = applications
         .map((app) => {
             const internship = app.internship || {};
+            const companyId = internship.postedBy?._id || internship.postedBy;
+
+            const cancelBtnHTML = app.status === "Pending"
+                ? `<button class="btn-secondary cancel-btn" style="border-color: #cbd5e1; color: #ef4444; padding: 8px 14px; font-size: 0.85rem; background: transparent; cursor: pointer; border-radius: 8px;" onclick="cancelUserApplication('${app._id}')">✕ Cancel Application</button>`
+                : "";
 
             return `
                 <div class="internship-card">
@@ -669,6 +713,17 @@ function renderApplications(applications) {
                         internship.stipend ? `Stipend: ${internship.stipend}` : null
                     ])}
                     <p>Status: ${renderStatus(app.status)}</p>
+                    <div class="card-actions" style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            ${cancelBtnHTML}
+                        </div>
+                        <button
+                            class="btn-secondary report-btn"
+                            style="border-color: #fca5a5; color: #dc2626; padding: 8px 14px; font-size: 0.85rem; background: transparent; cursor: pointer; border-radius: 8px;"
+                            onclick="openReportModal('${internship._id}', '${escapeHTML(internship.title || 'Internship')}', '${companyId}', '${escapeHTML(internship.companyName)}')">
+                            ⚠ Report
+                        </button>
+                    </div>
                 </div>
             `;
         })
@@ -706,7 +761,7 @@ function renderCompanyApplications(applications) {
             const student = app.student || {};
             const skills = Array.isArray(student.skills) ? student.skills.join(", ") : (student.skills || "N/A");
             const resumeLink = student.resumeUrl || app.resume;
-            
+
             const resumeHTML = resumeLink
                 ? `<p><strong>Resume:</strong> <a href="${escapeHTML(resumeLink)}" target="_blank" style="color: #3B82F6; text-decoration: underline;">Download Resume</a></p>`
                 : `<p><strong>Resume:</strong> No resume uploaded</p>`;
@@ -778,7 +833,13 @@ async function updateStatus(id, status) {
 document.addEventListener("click", async (event) => {
     if (!event.target.classList.contains("delete-btn")) return;
 
-    if (!confirm("Delete this internship?")) return;
+    const confirmDelete = await showConfirmModal(
+        "Delete Internship?",
+        "Are you sure you want to delete this internship? This action cannot be undone.",
+        "Delete",
+        "Cancel"
+    );
+    if (!confirmDelete) return;
 
     try {
         const response = await apiRequest(
@@ -1048,12 +1109,13 @@ async function viewCompanyProfile(companyId) {
             document.getElementById("compModalEmail").textContent = comp.email || "N/A";
             document.getElementById("compModalIndustry").textContent = comp.industry || "N/A";
             document.getElementById("compModalLocation").textContent = comp.location || "N/A";
-            
+
             const initials = getInitials(comp.name);
             document.getElementById("compModalInitials").textContent = initials;
 
             const webLink = document.getElementById("compModalWebsite");
             const webLinkNone = document.getElementById("compModalWebsiteNone");
+
             if (comp.website) {
                 webLink.href = comp.website.startsWith("http") ? comp.website : `https://${comp.website}`;
                 webLink.textContent = comp.website;
@@ -1063,7 +1125,7 @@ async function viewCompanyProfile(companyId) {
                 webLink.style.display = "none";
                 webLinkNone.style.display = "inline";
             }
-            
+
             document.getElementById("compModalAbout").textContent = comp.about || "No details provided.";
             document.getElementById("companyProfileModal").style.display = "flex";
         }
@@ -1074,4 +1136,91 @@ async function viewCompanyProfile(companyId) {
 
 function closeCompanyProfileModal() {
     document.getElementById("companyProfileModal").style.display = "none";
+}
+
+async function loadDashboardAnnouncements() {
+    const section = document.getElementById("announcementsSection");
+    const titleEl = document.getElementById("announcementTitle");
+    const bodyEl = document.getElementById("announcementBody");
+    const metaEl = document.getElementById("announcementMeta");
+
+    if (!section) return;
+
+    try {
+        const res = await apiRequest("/announcements");
+        if (res.success && res.announcements.length > 0) {
+            const latest = res.announcements[0];
+            titleEl.innerText = latest.title;
+            bodyEl.innerText = latest.content;
+
+            const dateStr = new Date(latest.createdAt).toLocaleDateString("en-US", {
+                year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+            });
+            metaEl.innerText = `Posted on ${dateStr} by Admin`;
+            section.style.display = "block";
+
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        } else {
+            section.style.display = "none";
+        }
+    } catch (error) {
+        console.error("Failed to load dashboard announcements", error);
+    }
+}
+
+function openReportModal(internshipId, title, companyId, companyName) {
+    const modal = document.getElementById("reportInternshipModal");
+    if (!modal) return;
+
+    document.getElementById("reportInternshipId").value = internshipId;
+    document.getElementById("reportCompanyId").value = companyId;
+    document.getElementById("reportCompanyName").value = companyName;
+    document.getElementById("reportInternshipTitle").value = title;
+
+    document.getElementById("reportType").value = "";
+    document.getElementById("reportDescription").value = "";
+
+    modal.style.display = "flex";
+    if (window.lucide) window.lucide.createIcons();
+}
+
+function closeReportModal() {
+    const modal = document.getElementById("reportInternshipModal");
+    if (modal) modal.style.display = "none";
+}
+
+async function submitReportForm(event) {
+    event.preventDefault();
+
+    const internshipId = document.getElementById("reportInternshipId").value;
+    const reportType = document.getElementById("reportType").value;
+    const description = document.getElementById("reportDescription").value.trim();
+
+    if (!reportType || !description) {
+        showToast("Please fill all required report fields.");
+        return;
+    }
+
+    const confirmSubmit = await showConfirmModal(
+        "Submit Report?",
+        `Are you sure you want to submit this report? Reason: ${reportType}. This will flag the listing for admin review.`,
+        "Submit",
+        "Cancel"
+    );
+    if (!confirmSubmit) return;
+
+    try {
+        const response = await apiRequest("/reports", "POST", {
+            internshipId,
+            reportType,
+            description
+        });
+
+        showToast(response.message);
+        closeReportModal();
+    } catch (error) {
+        showToast(error.message);
+    }
 }

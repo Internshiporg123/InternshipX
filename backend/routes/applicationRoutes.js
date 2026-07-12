@@ -5,7 +5,8 @@ const {
     applyInternship,
     getCompanyApplications,
     updateApplicationStatus,
-    getStudentApplications
+    getStudentApplications,
+    cancelApplication
 } = require("../controllers/applicationController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -36,6 +37,11 @@ router.patch(
     roleMiddleware("company"),
     updateApplicationStatus
 );
+router.delete(
+    "/:applicationId",
+    authMiddleware,
+    roleMiddleware("student"),
+    cancelApplication
+);
 
 module.exports = router;
-// Student View Own Applications

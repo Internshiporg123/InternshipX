@@ -1,5 +1,4 @@
-// InternshipX Authentication
-// Crafted by ByteForge
+
 
 const registerForm = document.getElementById("registerForm");
 
@@ -31,8 +30,6 @@ async function registerUser(e) {
     const college = document.getElementById("college") ? document.getElementById("college").value.trim() : "";
     const industry = document.getElementById("industry") ? document.getElementById("industry").value.trim() : "";
     const location = document.getElementById("location") ? document.getElementById("location").value.trim() : "";
-
-    // Validation
 
     if (name.length < 3) {
 
@@ -76,8 +73,6 @@ async function registerUser(e) {
 
         message.innerHTML = response.message;
 
-        // Save email for OTP page
-
         sessionStorage.setItem("verifyEmail", email);
 
         setTimeout(() => {
@@ -117,9 +112,6 @@ if (emailInput) {
     }
 
 }
-/* =========================================
-   VERIFY OTP
-========================================= */
 
 const verifyForm = document.getElementById("verifyForm");
 
@@ -178,9 +170,6 @@ async function verifyOTP(e) {
     }
 
 }
-/* =========================================
-   RESEND OTP
-========================================= */
 
 const resendBtn = document.getElementById("resendBtn");
 
@@ -196,7 +185,7 @@ async function resendOTP(){
 
     if(!email){
 
-        alert("Enter your email first.");
+        await showAlertModal("Input Required", "Enter your email first.");
 
         return;
 
@@ -212,20 +201,17 @@ async function resendOTP(){
             }
         );
 
-        alert(response.message);
+        await showAlertModal("Verification Code", response.message);
 
     }
 
     catch(error){
 
-        alert(error.message);
+        await showAlertModal("Error", error.message);
 
     }
 
 }
-/* =========================================
-   LOGIN
-========================================= */
 
 const loginForm = document.getElementById("loginForm");
 
@@ -267,6 +253,10 @@ async function loginUser(e) {
 
                 window.location.href = "student-dashboard.html";
 
+            } else if (response.user.role === "admin") {
+
+                window.location.href = "admin-dashboard.html";
+
             } else {
 
                 window.location.href = "company-dashboard.html";
@@ -284,10 +274,6 @@ async function loginUser(e) {
     }
 
 }
-
-/* =========================================
-   FORGOT PASSWORD
-========================================= */
 
 const forgotPasswordForm = document.getElementById("forgotPasswordForm");
 
@@ -327,7 +313,6 @@ async function sendResetCode(e) {
         message.style.color = "#22C55E";
         message.innerHTML = response.message;
 
-        // Save email and show step 2
         sessionStorage.setItem("resetEmail", email);
 
         setTimeout(() => {
@@ -366,17 +351,12 @@ function showResetForm(email) {
 
 }
 
-/* =========================================
-   RESET PASSWORD (Step 2)
-========================================= */
-
 const verifyResetOtpForm = document.getElementById("verifyResetOtpForm");
 
 if (verifyResetOtpForm) {
 
     verifyResetOtpForm.addEventListener("submit", resetPassword);
 
-    // If page reloaded and email is stored, show step 2
     const savedResetEmail = sessionStorage.getItem("resetEmail");
 
     if (savedResetEmail) {
@@ -399,7 +379,6 @@ async function resetPassword(e) {
 
     message.innerHTML = "";
 
-    // Client-side validation
     if (!otp || otp.length !== 6) {
         message.style.color = "#EF4444";
         message.innerHTML = "Please enter a valid 6-digit code.";
@@ -457,10 +436,6 @@ async function resetPassword(e) {
     }
 
 }
-
-/* =========================================
-   RESEND RESET CODE
-========================================= */
 
 const resendResetBtn = document.getElementById("resendResetBtn");
 

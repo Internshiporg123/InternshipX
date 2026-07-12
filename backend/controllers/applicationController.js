@@ -2,14 +2,12 @@ const Application = require("../models/Application");
 const Internship = require("../models/Internship");
 const User = require("../models/User");
 
-// Student Apply
 exports.applyInternship = async (req, res) => {
     try {
 
         const internshipId = req.params.internshipId;
         const studentId = req.user.id;
 
-        // Check internship exists
         const internship = await Internship.findById(internshipId);
 
         if (!internship) {
@@ -19,7 +17,6 @@ exports.applyInternship = async (req, res) => {
             });
         }
 
-        // Check duplicate application
         const existing = await Application.findOne({
             internship: internshipId,
             student: studentId
@@ -32,10 +29,8 @@ exports.applyInternship = async (req, res) => {
             });
         }
 
-        // Retrieve student's profile details to get their resume URL
         const student = await User.findById(studentId);
 
-        // Create application
         const application = await Application.create({
             internship: internshipId,
             student: studentId,
@@ -85,14 +80,13 @@ exports.getCompanyApplications = async (req, res) => {
 
     }
 };
-// Company Update Application Status
+
 exports.updateApplicationStatus = async (req, res) => {
     try {
 
         const { applicationId } = req.params;
         const { status } = req.body;
 
-        // Only these statuses are allowed
         const allowedStatus = [
             "Pending",
             "Reviewed",
@@ -117,7 +111,6 @@ exports.updateApplicationStatus = async (req, res) => {
             });
         }
 
-        // Make sure the internship belongs to the logged-in company
         if (
             application.internship.postedBy.toString() !==
             req.user.id
@@ -155,7 +148,7 @@ exports.getStudentApplications = async (req, res) => {
         })
         .populate(
             "internship",
-            "title companyName location stipend duration"
+            "title companyName location stipend duration postedBy"
         )
         .sort({ createdAt: -1 });
 
@@ -172,5 +165,38 @@ exports.getStudentApplications = async (req, res) => {
             message: err.message
         });
 
+    }
+};
+
+exports.cancelApplication = async (req, res) => {
+    try {
+        const { applicationId } = req.params;
+        const application = await Application.findById(applicationId);
+
+        if (!application) {
+            return res.status(404).json({
+                success: false,
+                message: "Application not found."
+            });
+        }
+
+        if (application.student.toString() !== req.user.id) {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized to cancel this application."
+            });
+        }
+
+        await Application.findByIdAndDelete(applicationId);
+
+        res.json({
+            success: true,
+            message: "Application cancelled successfully."
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
     }
 };

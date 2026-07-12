@@ -1,7 +1,6 @@
 require("dotenv").config();
 const authRoutes = require("./routes/authRoutes");
 
-
 const express = require("express");
 const cors = require("cors");
 
@@ -10,6 +9,9 @@ const authMiddleware = require("./middleware/authMiddleware");
 const roleMiddleware = require("./middleware/roleMiddleware");
 const internshipRoutes = require("./routes/internshipRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const reportRoutes = require("./routes/reportRoutes");
+const announcementRoutes = require("./routes/announcementRoutes");
 const {
     getProfile,
     updateProfile,
@@ -21,7 +23,7 @@ const {
 const multer = require("multer");
 const upload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 } // 5MB file size limit
+    limits: { fileSize: 5 * 1024 * 1024 }
 });
 const app = express();
 
@@ -33,6 +35,9 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/internships", internshipRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/announcements", announcementRoutes);
 app.get("/", (req, res) => {
   res.send("Internship Portal API Running...");
 });

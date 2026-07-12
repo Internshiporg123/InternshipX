@@ -1,6 +1,5 @@
 const Internship = require("../models/Internship");
 
-// Create Internship
 exports.createInternship = async (req, res) => {
 
     try {
@@ -48,7 +47,6 @@ exports.createInternship = async (req, res) => {
     }
 
 };
-// Get internships posted by logged-in company
 
 exports.getCompanyInternships = async (req, res) => {
 
@@ -72,7 +70,7 @@ exports.getCompanyInternships = async (req, res) => {
     }
 
 };
-// Get All Internships
+
 exports.getAllInternships = async (req, res) => {
 
     try {
@@ -93,7 +91,6 @@ exports.getAllInternships = async (req, res) => {
 
 };
 
-// Get public latest internships for the homepage
 exports.getPublicInternships = async (req, res) => {
 
     try {
@@ -162,7 +159,7 @@ exports.deleteInternship = async(req,res)=>{
     }
 
 };
-// Update Internship
+
 exports.updateInternship = async (req, res) => {
 
     try {
@@ -206,4 +203,22 @@ exports.updateInternship = async (req, res) => {
 
     }
 
+};
+
+exports.getInternshipById = async (req, res) => {
+    try {
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            return res.status(404).json({
+                success: false,
+                message: "Internship not found."
+            });
+        }
+        res.json(internship);
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 };

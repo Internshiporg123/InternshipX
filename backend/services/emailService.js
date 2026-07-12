@@ -39,7 +39,7 @@ const getPublicEmailErrorMessage = (error) => {
 const createTransporter = () => {
     const { user, pass } = getEmailConfig();
     const host = process.env.SMTP_HOST || "smtp-relay.brevo.com";
-    const port = Number(process.env.SMTP_PORT) || 2525; // Default to 2525 to bypass Render port blocks
+    const port = Number(process.env.SMTP_PORT) || 2525;   // Use port 2525 because Render blocks other standard SMTP ports
     const secure = process.env.SMTP_SECURE === "true" || port === 465;
 
     return nodemailer.createTransport({
